@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRUD</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;700&family=Roboto:wght@100;300;400;500;700;900&family=Source+Sans+Pro:wght@200;300;400;600;700;900&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .container {
+      width: 90%;
+      height: 80%;
+      border-radius: 10px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: auto 12px;
+    }
+
+    .header span {
+      font-weight: 900;
+      font-size: 20px;
+      word-break: break-all;
+    }
+
+    #new {
+      font-size: 16px;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      color: white;
+      background-color: rgb(57, 57, 226);
+      transition: background-color 0.3s ease;
+    }
+
+    #new:hover {
+      background-color: rgb(40, 40, 180);
+    }
+
+    .divTable {
+      padding: 10px;
+      width: auto;
+      flex-grow: 1;
+      overflow: auto;
+    }
+
+    .divTable::-webkit-scrollbar {
+      width: 12px;
+      background-color: whitesmoke;
+    }
+
+    .divTable::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: darkgray;
+    }
+
+    table {
+      width: 100%;
+      border-spacing: 10px;
+      word-break: break-all;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead {
+      background-color: whitesmoke;
+    }
+
+    tr {
+      border-bottom: 1px solid rgb(238, 235, 235) !important;
+    }
+
+    tbody tr td {
+      vertical-align: text-top;
+      padding: 6px;
+      max-width: 200px;
+      word-wrap: break-word;
+    }
+
+    thead tr th {
+      padding: 5px;
+      text-align: start;
+      margin-bottom: 50px;
+    }
+
+    tbody tr {
+      margin-bottom: 50px;
+    }
+
+    thead tr th.acao {
+      width: 100px !important;
+      text-align: center;
+    }
+
+    tbody tr td.acao {
+      text-align: center;
+    }
+
+    td button {
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    td button:hover {
+      background-color: #ddd;
+    }
+
+    td button i {
+      font-size: 25px;
+      vertical-align: middle;
+    }
+
+    td button i:first-child {
+      margin-right: 10px;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        font-size: 10px;
+      }
+
+      .header span {
+        font-size: 15px;
+      }
+
+      #new {
+        padding: 5px;
+        font-size: 10px;
+      }
+
+      thead tr th.acao {
+        width: auto !important;
+      }
+
+      td button i {
+        font-size: 20px !important;
+      }
+
+      td button i:first-child {
+        margin-right: 0;
+      }
+
+      .modal {
+        width: 90% !important;
+      }
+
+      .modal label {
+        font-size: 12px !important;
+      }
+    }
+
+    .modal-container {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-container.active {
+      display: flex;
+    }
+
+    .modal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      background-color: white;
+      border-radius: 10px;
+      width: 50%;
+      max-width: 500px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+      animation: modal .4s ease forwards;
+    }
+
+    @keyframes modal {
+      from {
+        opacity: 0;
+        transform: translate3d(0, -60px, 0);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    .modal label {
+      font-size: 14px;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+
+    .modal input {
+      outline: none;
+      padding: 8px 12px;
+      width: 100%;
+      margin-bottom: 20px;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .modal input:focus {
+      border-color: rgb(57, 57, 226);
+      box-shadow: 0 0 5px rgba(57, 57, 226, 0.5);
+    }
+
+    .modal button {
+      width: 100%;
+      margin: 10px auto 0;
+      outline: none;
+      border-radius: 20px;
+      padding: 10px 15px;
+      border: none;
+      background-color: rgb(57, 57, 226);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .modal button:hover {
+      background-color: rgb(40, 40, 180);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <span>Cadastro de Funcionários</span>
+    </div>
+
+    <div class="divTable">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Função</th>
+            <th>Salário</th>
+            <th class="acao">Editar</th>
+            <th class="acao">Excluir</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="modal-container" id="modal">
+      <div class="modal">
+        <form id="form">
+          <label for="m-nome">Nome</label>
+          <input id="m-nome" type="text" required />
+
+          <label for="m-funcao">Função</label>
+          <input id="m-funcao" type="text" required />
+
+          <label for="m-salario">Salário</label>
+          <input id="m-salario" type="number" step="0.01" min="0" required />
+          <button id="btnSalvar" type="submit">Salvar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.querySelector('.modal-container');
+    const divTable = document.querySelector('.divTable');
+    const btnNew = document.createElement('button');
+    btnNew.id = 'new';
+    btnNew.innerText = 'Incluir';
+    document.querySelector('.header').appendChild(btnNew);
+
+    let itens = [];
+    let id;
+
+    // Cria a tabela se não existir
+    function renderTable() {
+      if (!document.querySelector('table')) {
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Função</th>
+              <th>Salário</th>
+              <th class="acao">Editar</th>
+              <th class="acao">Excluir</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        divTable.appendChild(table);
+      }
+    }
+    renderTable();
+    const tbody = document.querySelector('tbody');
+
+    // Carrega os funcionários do backend
+    async function loadItens() {
+      const res = await fetch('/vendas');
+      itens = await res.json();
+      tbody.innerHTML = '';
+      itens.forEach((item, index) => insertItem(item, index));
+    }
+
+    // Adiciona funcionário
+    async function addItem(funcionario) {
+      await fetch('/vendas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(funcionario)
+      });
+      await loadItens();
+    }
+
+    // Atualiza funcionário
+    async function updateItem(id, funcionario) {
+      await fetch(`/vendas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(funcionario)
+      });
+      await loadItens();
+    }
+
+    // Deleta funcionário
+    async function deleteItem(index) {
+      if (confirm('Deseja realmente deletar este funcionário?')) {
+        await fetch(`/vendas/${itens[index]._id}`, { method: 'DELETE' });
+        await loadItens();
+      }
+    }
+
+    // Abre o modal para novo ou edição
+    function openModal(edit = false, index = 0) {
+      modal.innerHTML = `
+        <form id="form" class="modal">
+          <label for="m-nome">Nome</label>
+          <input id="m-nome" type="text" value="${edit ? itens[index].nome : ''}" required />
+          <label for="m-funcao">Função</label>
+          <input id="m-funcao" type="text" value="${edit ? itens[index].funcao : ''}" required />
+          <label for="m-salario">Salário</label>
+          <input id="m-salario" type="number" value="${edit ? itens[index].salario : ''}" required />
+          <button id="btnSalvar" type="submit">Salvar</button>
+        </form>
+      `;
+      modal.classList.add('active');
+      id = edit ? index : undefined;
+
+      const form = document.querySelector('#form');
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const funcionario = {
+          nome: document.querySelector('#m-nome').value.trim(),
+          funcao: document.querySelector('#m-funcao').value.trim(),
+          salario: parseFloat(document.querySelector('#m-salario').value.trim())
+        };
+        if (id !== undefined) {
+          await updateItem(itens[id]._id, funcionario);
+        } else {
+          await addItem(funcionario);
+        }
+        modal.classList.remove('active');
+        id = undefined;
+      });
+    }
+
+    // Fecha o modal ao clicar fora
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        id = undefined;
+      }
+    });
+
+    // Insere uma linha na tabela
+    function insertItem(item, index) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.nome}</td>
+        <td>${item.funcao}</td>
+        <td>${item.salario}</td>
+        <td class="acao"><button onclick="editItem(${index})"><i class='bx bx-edit'></i></button></td>
+        <td class="acao"><button onclick="deleteItem(${index})"><i class='bx bx-trash'></i></button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Funções globais para os botões
+    window.editItem = function(index) {
+      openModal(true, index);
+    };
+    window.deleteItem = deleteItem;
+
+    // Botão "Incluir"
+    btnNew.addEventListener('click', () => {
+      openModal();
+    });
+
+    // Carrega os dados ao iniciar
+    loadItens();
+  </script>
+</body>
+
+</html>
+
